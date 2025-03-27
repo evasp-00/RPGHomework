@@ -2,8 +2,30 @@ using UnityEngine;
 
 public class Character : MonoBehaviour
 {
+    public int maxHealth;
     public int health;
-    [SerializeField] private Weapon activeWeapon;
+
+    public int bleeding;
+    public int weakness;
+    public int power;
+
+    [SerializeField] protected Weapon activeWeapon;
+
+
+    private void Awake()
+    {
+        resetCharacter();
+    }
+
+    public void resetCharacter()
+    {
+        health = maxHealth;
+        bleeding = 0;
+        weakness = 0;
+        power = 0;
+    }
+
+
     public Weapon ActiveWeapon
     { 
         get { return activeWeapon; }    
@@ -16,17 +38,41 @@ public class Character : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        Debug.Log(name + " health befor hit: " + health);
-        health -= damage;
-        Debug.Log(name + " health befor hit: " + health);
+        Debug.Log(name + " health before hit: " + health);
+        health -= damage - weakness + power;
+        Debug.Log(name + " health after hit: " + health);
     }
 
     public void TakeDamage(Weapon weapon)
     {
-        Debug.Log(name + " health befor hit: " + health);
-        health -= weapon.GetDamage();
-        weapon.ApllyEffect(this);
-        Debug.Log(name + " health befor hit: " + health);
+        Debug.Log(name + " health before hit: " + health);
+        health -= weapon.GetDamage() - weakness + power;
+        weapon.ApplyEffect(this);
+        Debug.Log(name + " health after hit: " + health);
+    }
+
+    public void EndRound()
+    {
+
+        Debug.Log(name + " weakness: " + weakness);
+
+        if (weakness > 0)
+        {
+            weakness--;
+        }
+
+        int bleed = bleeding / 5;
+
+        if (bleeding < 5)
+        {
+            bleed = bleeding;
+        }
+
+        Debug.Log(name + " blead: " + bleed);
+
+        health -= bleed;
+        bleeding -= bleed;
+
     }
 
 }

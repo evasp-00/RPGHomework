@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BasicWeapon : Weapon
 {
-    public override void ApllyEffect(Character character)
+    public override void ApplyEffect(Character character)
     {
         throw new System.NotImplementedException();
     }

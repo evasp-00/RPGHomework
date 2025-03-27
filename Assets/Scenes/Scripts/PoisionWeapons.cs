@@ -6,9 +6,9 @@ public class PoisionWeapons : Weapon
 {
     [SerializeField] private int poisionDamage = 2;
 
-    public override void ApllyEffect(Character character)
+    public override void ApplyEffect(Character character)
     {
         character.TakeDamage(poisionDamage);
-        Debug.Log(character.name + "took" + poisionDamage + "poison damage");
+        Debug.Log(character.name + " took " + poisionDamage + " poison damage");
     }
 }

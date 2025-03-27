@@ -11,5 +11,5 @@ public abstract class Weapon : MonoBehaviour
         return Random.Range(minDamage, maxDamage + 1);
     }
 
-    public abstract void ApllyEffect(Character character);
+    public abstract void ApplyEffect(Character character);
 }
