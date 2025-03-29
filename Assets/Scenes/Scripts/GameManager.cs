@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -9,7 +10,15 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Enemy[] enemies;
     [SerializeField] TMP_Text playerName, playerHealth, enemyName, enemyHealth, level, xp;
 
+    [SerializeField] private AudioSource attackSound;
+    [SerializeField] private AudioSource healSound;
+
+
     [SerializeField] private Image enemySprite;
+
+    [SerializeField] private GameObject gameOver;
+
+    [SerializeField] private TextMeshProUGUI healButton;
 
     public GameManager instance;
 
@@ -19,7 +28,7 @@ public class GameManager : MonoBehaviour
     private int xpGoal = 0;
 
 
-    public int round;
+    public int healCD;
 
     private int currentEnemy;
 
@@ -32,10 +41,12 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        round = 0;   
         getEnemy();
         RefreshUI();
         xpGoal = (playerLevel + 1) * 5;
+        healCD = 0;
+
+        gameOver.SetActive(false);
     }
 
     private void getEnemy()
@@ -45,10 +56,15 @@ public class GameManager : MonoBehaviour
 
     public void DoRound()
     {
+
+        attackSound.pitch = Random.Range(0.8f, 1.1f);
+        attackSound.Play();
+
         //int playerDamage = player.Attack();
         //enemy.TakeDamage(playerDamage);
         //Debug.Log("player name: " + player.CharName);
         enemies[currentEnemy].TakeDamage(player.ActiveWeapon);
+        enemies[currentEnemy].TakeDamage(player.power / 3);
         int enemyDamage = enemies[currentEnemy].Attack();
         player.TakeDamage(enemyDamage);
 
@@ -57,7 +73,8 @@ public class GameManager : MonoBehaviour
 
         if (enemies[currentEnemy].health <= 0)
         {
-            enemies[currentEnemy].resetCharacter();
+            enemies[currentEnemy].maxHealth += enemies[currentEnemy].healthGain;
+            enemies[currentEnemy].ResetCharacter();
             getEnemy();
             playerXP += 5;
         }
@@ -74,21 +91,55 @@ public class GameManager : MonoBehaviour
 
         RefreshUI();
 
-        round++;
+        healCD--;
 
+        if (player.health <= 0)
+        {
+            gameOver.SetActive(true);
+        }
+
+    }
+
+    public void HealSpell()
+    {
+        if (healCD <= 0 && player.health < player.maxHealth)
+        {
+            healSound.Play();
+            player.health += Random.Range(0 + player.power, 10 + player.power);
+            if (player.health > player.maxHealth) 
+            {
+                player.health = player.maxHealth;
+            }
+            healCD = Random.Range(7, 15);
+        }
+        RefreshUI();
     }
 
     public void RefreshUI()
     {
-        playerName.text = player.CharName;
+        if (healCD <= 0)
+        {
+            healButton.color = Color.white;
+        }
+        else
+        {
+            healButton.color = Color.black;
+        }
+
+        playerName.text = "Player: " + player.CharName;
         enemyName.text = enemies[currentEnemy].name;
-        playerHealth.text = "Health: " + player.health.ToString();
-        enemyHealth.text = "Health: " + enemies[currentEnemy].health.ToString();
+        playerHealth.text = "Health: " + player.maxHealth.ToString() + "/" + player.health.ToString();
+        enemyHealth.text = "Health: " + enemies[currentEnemy].maxHealth + "/" + enemies[currentEnemy].health.ToString();
         level.text = "Level: " + playerLevel.ToString();
-        xp.text = "XP: " + playerXP.ToString() + "/" + xpGoal.ToString();
+        xp.text = "XP: " + xpGoal.ToString() + "/" + playerXP.ToString();
 
 
         enemySprite.sprite = enemies[currentEnemy].getSprite();
+    }
+
+    public void Restart()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
     // Update is called once per frame
     void Update()

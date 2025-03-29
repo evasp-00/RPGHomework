@@ -5,7 +5,7 @@ public class Character : MonoBehaviour
     public int maxHealth;
     public int health;
 
-    public int bleeding;
+    private int bleeding;
     public int weakness;
     public int power;
 
@@ -14,10 +14,10 @@ public class Character : MonoBehaviour
 
     private void Awake()
     {
-        resetCharacter();
+        ResetCharacter();
     }
 
-    public void resetCharacter()
+    public virtual void ResetCharacter()
     {
         health = maxHealth;
         bleeding = 0;
@@ -25,6 +25,21 @@ public class Character : MonoBehaviour
         power = 0;
     }
 
+    public int Bleeding
+    {
+        get { return bleeding; }
+        set
+        {
+            if (value < 0)
+            { 
+                bleeding = 0;
+            }
+            else
+            {
+                bleeding = value;
+            }
+        }
+    }
 
     public Weapon ActiveWeapon
     { 
@@ -33,20 +48,22 @@ public class Character : MonoBehaviour
 
     public virtual int Attack()
     {
-        return activeWeapon.GetDamage();
+        int damage = activeWeapon.GetDamage() - weakness + power;
+        if (damage < 0) { damage = 0; }
+        return damage;
     }
 
     public void TakeDamage(int damage)
     {
         Debug.Log(name + " health before hit: " + health);
-        health -= damage - weakness + power;
+        health -= damage;
         Debug.Log(name + " health after hit: " + health);
     }
 
     public void TakeDamage(Weapon weapon)
     {
         Debug.Log(name + " health before hit: " + health);
-        health -= weapon.GetDamage() - weakness + power;
+        health -= weapon.GetDamage();
         weapon.ApplyEffect(this);
         Debug.Log(name + " health after hit: " + health);
     }

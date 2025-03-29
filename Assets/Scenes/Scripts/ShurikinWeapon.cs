@@ -8,6 +8,6 @@ public class ShurikinWeapon : Weapon
 
     public override void ApplyEffect(Character character)
     {
-        character.bleeding += bleedAmount;
+        character.Bleeding += bleedAmount;
     }
 }

@@ -9,8 +9,14 @@ public class Berserker : Enemy
     public override int Attack()
     {
         agression += agressionGain; 
-        return ActiveWeapon.GetDamage() + agression / 10;
-
+        return ActiveWeapon.GetDamage() + (agression / 10) - weakness + power;
     }
 
+    public override void ResetCharacter()
+    {
+        health = maxHealth;
+        Bleeding = 0;
+        weakness = 0;
+        agression = 0;
+    }
 }
