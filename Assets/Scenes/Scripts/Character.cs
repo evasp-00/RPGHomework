@@ -1,10 +1,10 @@
+using UnityEditor;
 using UnityEngine;
 
 public class Character : MonoBehaviour
 {
     public int maxHealth;
     public int health;
-
     private int bleeding;
     public int weakness;
     public int power;
